@@ -1,5 +1,3 @@
-# eval修改事项
-# get_neighbor_sampler -> get_neighbor_sampler_sampleInterval
 import logging
 import time
 import sys
@@ -14,10 +12,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import get_scheduler
-
-
 from models.SiaTGL import SiaTGL
-
 from utils.utils import set_random_seed, convert_to_gpu, get_parameter_sizes, create_optimizer
 from utils.utils import get_neighbor_sampler, NegativeEdgeSampler,get_neighbor_sampler_sampleInterval
 from utils.metrics import get_link_prediction_metrics,get_link_prediction_metrics_original
@@ -28,7 +23,6 @@ from transformers import GPT2LMHeadModel, GPT2Config
 import random
 import torch.utils.data as data_
 from torch.utils.data import DataLoader
-
 from utils.utils_forInterval import MyData,my_collate_fn
 from torch.utils.data import DataLoader
 from utils.experiment_config import save_experiment_config
@@ -68,9 +62,9 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
-        os.makedirs(f"./logs/original_Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/", exist_ok=True)
+        os.makedirs(f"./logs/Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/", exist_ok=True)
         # create file handler that logs debug and higher level messages
-        fh = logging.FileHandler(f"./logs/original_Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/{str(time.time())}.log")
+        fh = logging.FileHandler(f"./logs/Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/{str(time.time())}.log")
         fh.setLevel(logging.DEBUG)
         # create console handler with a higher log level
         ch = logging.StreamHandler()
@@ -200,7 +194,6 @@ if __name__ == "__main__":
                 batch_neg_dst_node_ids_ls = batch_data[3].astype(int)
                 batch_node_interact_times_ls = batch_data[4].astype(float)
                 batch_sampleInterval_ls = batch_data[5].astype(float)
-                # print()
                 
                 batch_edge_ids_ls = batch_data[6].astype(float)
 
@@ -256,7 +249,6 @@ if __name__ == "__main__":
                 loss = args.factor*loss_func(input=predicts, target=labels) + (1-args.factor)*(ssl_pos_loss+ssl_neg_loss)
 
                 train_losses.append(loss.item())
-                #print(logits.shape)
                 train_metrics.append(get_link_prediction_metrics_original(predicts=predicts.view(-1,1), labels=labels.view(-1,1).float()))
             
                 optimizer.zero_grad()
@@ -265,7 +257,6 @@ if __name__ == "__main__":
                 lr_scheduler.step()
                    
                 train_idx_data_loader_tqdm.set_description(f'Epoch: {epoch + 1}, train for the {batch_idx + 1}-th batch, train loss: {loss.item()}')
-                #break
                 if args.model_name in ['JODIE', 'DyRep', 'TGN']:
                     # detach the memories and raw messages of nodes in the memory bank after each batch, so we don't back propagate to the start of time
                        model[0].memory_bank.detach_memory_bank()

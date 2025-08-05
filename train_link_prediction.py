@@ -1,5 +1,3 @@
-# eval修改事项
-# get_neighbor_sampler -> get_neighbor_sampler_sampleInterval
 import logging
 import time
 import sys
@@ -15,12 +13,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import get_scheduler
 from models.SiaTGL import SiaTGL
-
 from models.DyGIL_faster_node import DyGIL_faster as DyGIL_mul
 from models.modules import MergeLayer
 from utils.utils import set_random_seed, convert_to_gpu, get_parameter_sizes, create_optimizer
 from utils.utils import get_neighbor_sampler, NegativeEdgeSampler,get_neighbor_sampler_sampleInterval
-# from evaluate_models_utils import evaluate_model_link_prediction
 from utils.metrics import get_link_prediction_metrics,get_link_prediction_metrics_original
 from utils.DataLoader import get_pretrain_train_data
 from utils.EarlyStopping import EarlyStopping
@@ -29,16 +25,13 @@ from transformers import GPT2LMHeadModel, GPT2Config
 import random
 import torch.utils.data as data_
 from torch.utils.data import DataLoader
-
 from utils.utils_forInterval import MyData,my_collate_fn
 from torch.utils.data import DataLoader
 from utils.experiment_config import save_experiment_config
 
 def get_dataset(args):
-    with open('./generate_dataset/dataset_mapping.pkl', 'rb') as f:
-        dataset_dict_read = pickle.load(f)
     node_raw_features, edge_raw_features, train_data= \
-        get_pretrain_train_data(dataset_name=dataset_dict_read[args.pretrainTestDataset], val_ratio=args.val_ratio, test_ratio=args.test_ratio, interval=str(args.interval))
+        get_pretrain_train_data(dataset_name=args.pretrainTestDataset, val_ratio=args.val_ratio, test_ratio=args.test_ratio, interval=str(args.interval))
 
     train_neighbor_sampler = get_neighbor_sampler_sampleInterval(data=train_data, sample_neighbor_strategy=args.sample_neighbor_strategy, time_scaling_factor=args.time_scaling_factor, seed=0)
     train_neg_edge_sampler = NegativeEdgeSampler(src_node_ids=train_data.src_node_ids, dst_node_ids=train_data.dst_node_ids)
@@ -67,15 +60,13 @@ if __name__ == "__main__":
 
         args.seed = run
         args.save_model_name = f'{args.model_name}_seed{args.seed}'
-        with open('./generate_dataset/dataset_mapping.pkl', 'rb') as f:
-            dataset_dict_read = pickle.load(f)
         # set up logger
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
-        os.makedirs(f"./logs/original_Benchmark/{args.model_name}/{dataset_dict_read[args.pretrainTestDataset]}/{args.save_model_name}/", exist_ok=True)
+        os.makedirs(f"./logs/Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/", exist_ok=True)
         # create file handler that logs debug and higher level messages
-        fh = logging.FileHandler(f"./logs/original_Benchmark/{args.model_name}/{dataset_dict_read[args.pretrainTestDataset]}/{args.save_model_name}/{str(time.time())}.log")
+        fh = logging.FileHandler(f"./logs/Benchmark/{args.model_name}/{args.pretrainTestDataset}/{args.save_model_name}/{str(time.time())}.log")
         fh.setLevel(logging.DEBUG)
         # create console handler with a higher log level
         ch = logging.StreamHandler()
@@ -156,7 +147,7 @@ if __name__ == "__main__":
         lr_scheduler = get_scheduler(
             name="linear", optimizer=optimizer, num_warmup_steps=num_batches*2, num_training_steps=num_training_steps
         )
-        save_path = f'./test_saved/pretrain/{args.model_name}/{dataset_dict_read[args.pretrainTestDataset]}/seed{args.seed}/'
+        save_path = f'./test_saved/pretrain/{args.model_name}/{args.pretrainTestDataset}/seed{args.seed}/'
         if not os.path.exists(save_path):
             os.makedirs(save_path)
             print("already created:", save_path)

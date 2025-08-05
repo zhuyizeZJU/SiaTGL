@@ -22,7 +22,6 @@ from utils.load_configs import get_link_prediction_args
 from transformers import GPT2LMHeadModel, GPT2Config
 from datetime import datetime
 from utils.utils_forInterval import MyData,my_collate_fn
-
 from torch.utils.data import DataLoader
 
 
@@ -36,8 +35,6 @@ if __name__ == "__main__":
     testGap = 'original'
     # get data for training, validation and testing
 
-    with open('./generate_dataset/dataset_mapping.pkl', 'rb') as f:
-        dataset_dict_read = pickle.load(f)
     node_raw_features, edge_raw_features, test_data= \
         get_pretrain_test_data(dataset_name=args.pretrainTestDataset, val_ratio=args.val_ratio, test_ratio=args.test_ratio,interval=args.testInterval)
     
@@ -50,9 +47,6 @@ if __name__ == "__main__":
 
     patch_size = args.patch_size
     max_input_sequence_length = args.max_input_sequence_length
-
-        
-
         
     indices_3 = np.argsort(test_data.node_interact_times)
     test_data.train_src_node_ids = test_data.src_node_ids[indices_3]
@@ -61,9 +55,6 @@ if __name__ == "__main__":
     test_data.train_sampleInterval = test_data.sampleInterval[indices_3]
     test_data.train_edge_ids = test_data.edge_ids[indices_3]
     test_data.train_labels = test_data.labels[indices_3]
-    
-    
-
     test_data = MyData(test_data)
     test_fn = my_collate_fn(args.batch_size,patch_size,max_input_sequence_length,test_neg_edge_sampler,test_neighbor_sampler,False)
     test_idx_data_loader = DataLoader(test_data, batch_size=args.batch_size, num_workers=32,shuffle=False, collate_fn=test_fn.Pretrain_collate_fn,drop_last=True,pin_memory=True)
@@ -154,7 +145,7 @@ if __name__ == "__main__":
         model = nn.Sequential(dynamic_backbone, link_predictor)
         
  
-        model.load_state_dict(torch.load(f'./test_saved/finetune/{args.model_name}/{dataset_dict_read[args.pretrainTestDataset]}/seed{run}_ssl{args.ssl_split_n}_f{args.factor}_i{args.testInterval}_d{args.time_feat_dim}/save_model_{epoch}.pkl',map_location=args.device))
+        model.load_state_dict(torch.load(f'./test_saved/finetune/{args.model_name}/{args.pretrainTestDataset}/seed{run}_ssl{args.ssl_split_n}_f{args.factor}_i{args.testInterval}_d{args.time_feat_dim}/save_model_{epoch}.pkl',map_location=args.device))
 
         model = convert_to_gpu(model, device=args.device)
         

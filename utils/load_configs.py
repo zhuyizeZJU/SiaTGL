@@ -14,13 +14,11 @@ def get_link_prediction_args(is_evaluation: bool = False):
                         choices=['wikipedia', 'reddit', 'mooc', 'lastfm', 'myket', 'enron', 'SocialEvo', 'uci', 'Flights', 'CanParl', 'USLegis', 'UNtrade', 'UNvote', 'Contacts','review','nearby','dgraphfin','mathoverflow','bitcoin','college','ubuntu','email','wiki-talk','superuser','dppi'])
     parser.add_argument('--pretrainTestDataset', type=str, help='dataset train on ', default='wikipedia',
                         choices=['wikipedia', 'reddit', 'mooc', 'lastfm', 'myket', 'enron', 'SocialEvo', 'uci', 'Flights', 'CanParl', 'USLegis', 'UNtrade', 'UNvote', 'Contacts','review','nearby','dgraphfin','mathoverflow','bitcoin','college','ubuntu','email','wiki-talk','superuser','dppi'])
-
     parser.add_argument('--dataset_name', type=str, help='dataset to be used', default='wikipedia',
                         choices=['wikipedia', 'reddit', 'mooc', 'lastfm', 'myket', 'enron', 'SocialEvo', 'uci', 'Flights', 'CanParl', 'USLegis', 'UNtrade', 'UNvote', 'Contacts','review','nearby','dgraphfin','mathoverflow','bitcoin','college','ubuntu','email','wiki-talk','superuser','dppi'])
     parser.add_argument('--batch_size', type=int, default=128, help='batch size baseline')
     parser.add_argument('--ssl_split_n', type=int, default=2, help='ssl_split_n')
     parser.add_argument('--factor', type=float, default=1, help='factor')       
-    
     parser.add_argument('--interval', type=str, default='day', help='interval')
     parser.add_argument('--testInterval', type=str, default='day', help='testInterval')
     parser.add_argument('--model_name', type=str, default='DyGFormer', help='name of the model, note that EdgeBank is only applicable for evaluation',

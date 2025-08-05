@@ -53,11 +53,8 @@ def evaluate_model_link_prediction(model_name: str, model: nn.Module, neighbor_s
             batch_neg_src_node_ids = batch_data[2].astype(int)[0]
             batch_neg_dst_node_ids = batch_data[3].astype(int)[0]
             batch_node_interact_times = batch_data[4].astype(float)[0]
-            # batch_sampleInterval = batch_data[5].astype(float)
             
             batch_edge_ids = batch_data[5].astype(float)[0]
-            #print(edge_labels.max())
-            #print(edge_labels)
             
             # we need to compute for positive and negative edges respectively, because the new sampling strategy (for evaluation) allows the negative source nodes to be
             # different from the source nodes, this is different from previous works that just replace destination nodes with negative destination nodes
