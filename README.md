@@ -1,6 +1,4 @@
 # SiaTGL
-
-## Introduction
 SiaTGL (Sampling Interval-Aware Temporal Graph Learning) is a novel framework that learns robust representations from dynamic graphs with varying time scales. It is the first model to explicitly incorporate the sampling interval as a core feature. Through its unique Sampling Interval Alignment (SIA) module, SiaTGL uses a self-supervised task on multi-granularity data to capture true evolutionary dynamics. This enables state-of-the-art generalization to different, even unseen, temporal intervals without requiring fine-tuning.
 
 ## Usage
